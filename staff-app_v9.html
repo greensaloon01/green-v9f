@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08090d">
+<title>Green Salon</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090d;--s1:#0f1117;--s2:#181922;--s3:#20212e;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);
+  --acc:#22d3a8;--warn:#f59e0b;--danger:#f43f5e;--purple:#818cf8;
+  --txt:#eeeef5;--muted:#6b6b8a;--dim:#9898b8;
+  --cash:#22d3a8;--online:#818cf8;--upi:#fb923c;--product:#a78bfa;--expense:#f43f5e;
+  --r:12px;--r2:18px;--r3:24px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);display:flex;flex-direction:column}
+
+/* BAR */
+.bar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--s1);border-bottom:1px solid var(--b);z-index:10}
+.bar-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.5px;user-select:none}
+.bar-brand em{color:var(--acc);font-style:normal}
+.bar-mid{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--dim)}
+.branch-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.bar-right{display:flex;align-items:center;gap:10px}
+.bar-time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.btn-change{padding:5px 12px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none}
+.btn-change:active{color:var(--txt);border-color:var(--acc)}
+
+/* SCREENS */
+.screens{flex:1;overflow:hidden;position:relative}
+.scr{position:absolute;inset:0;overflow-y:auto;padding:16px 16px 90px;display:none;-webkit-overflow-scrolling:touch}
+.scr.on{display:block;animation:fu .18s ease}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* SETUP */
+.setup-wrap{max-width:420px;margin:16px auto 0;text-align:center}
+.setup-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--acc),var(--s2));border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:32px}
+.setup-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:700;margin-bottom:6px}
+.setup-sub{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:24px}
+.sf-lbl{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sf-hint{font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:12px;line-height:1.5}
+.sf-hint code{background:var(--s3);padding:1px 5px;border-radius:4px;font-size:10px;color:var(--acc)}
+.sf-input,.sf-sel{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);color:var(--txt);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s;appearance:none;-webkit-appearance:none}
+.sf-input:focus,.sf-sel:focus{border-color:var(--acc)}
+.sf-input::placeholder{color:var(--muted)}
+.sf-sel option{background:var(--s2)}
+.url-preview{background:var(--s3);border:1px solid var(--b);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);word-break:break-all;display:none}
+.url-preview.show{display:block}.url-preview span{color:var(--acc)}
+.btn-lock{width:100%;padding:15px;background:var(--acc);color:#08090d;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;margin-top:4px}
+.btn-lock:active{opacity:.85;transform:scale(.98)}
+.setup-err{font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+.setup-err.err{color:var(--danger)}.setup-err.ok{color:var(--acc)}.setup-err.info{color:var(--muted)}
+.setup-note{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.7;padding:11px 13px;background:var(--s2);border-radius:10px}
+.setup-note strong{color:var(--txt)}
+
+/* LANDING — STAFF GRID + SUMMARY + GLOBAL CARDS */
+.landing-page{}
+/* Branch summary card */
+.summary-card{background:linear-gradient(135deg,rgba(34,211,168,.12),rgba(34,211,168,.04));border:1px solid rgba(34,211,168,.25);border-radius:16px;padding:16px 18px;margin-bottom:16px}
+.sum-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sum-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--acc)}
+.sum-date{font-size:11px;color:var(--muted)}
+.sum-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sum-stat{text-align:center}
+.sum-stat-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--txt)}
+.sum-stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+/* Staff grid */
+.grid-hdr{margin-bottom:14px}
+.grid-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.grid-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+.scard{background:var(--s1);border:1px solid var(--b);border-radius:20px;padding:18px 10px;cursor:pointer;text-align:center;transition:all .15s;user-select:none;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;inset:0;background:var(--acc);opacity:0;transition:opacity .15s;border-radius:inherit}
+.scard:active{transform:scale(.93);border-color:var(--acc)}.scard:active::before{opacity:.06}
+.scard-av{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:var(--s2);border:2px solid var(--b);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--acc);position:relative;z-index:1}
+.scard-name{font-size:13px;font-weight:500;position:relative;z-index:1}
+.scard-badge{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:20px;font-size:10px;position:relative;z-index:1}
+.scard-badge.comm{background:rgba(34,211,168,.12);color:var(--acc)}
+.scard-badge.nocomm{background:rgba(107,107,138,.12);color:var(--muted)}
+/* Global action cards */
+.global-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.global-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.gcard{border-radius:16px;padding:16px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s;border:1px solid var(--b)}
+.gcard:active{transform:scale(.97)}
+.gcard.prod{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.25)}
+.gcard.exp{background:rgba(244,63,94,.07);border-color:rgba(244,63,94,.25)}
+.gcard-ic{font-size:26px;flex-shrink:0}
+.gcard-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.gcard.prod .gcard-name{color:var(--product)}
+.gcard.exp  .gcard-name{color:var(--expense)}
+.gcard-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ENTRY FLOW */
+.wrap{max-width:480px;margin:0 auto}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;padding:7px 0;margin-bottom:16px}
+.back-btn:active{color:var(--txt)}
+.staff-bar{display:flex;align-items:center;gap:12px;padding:12px 15px;background:var(--s1);border:1px solid var(--b);border-radius:15px;margin-bottom:20px}
+.sb-av{width:42px;height:42px;border-radius:50%;background:var(--s2);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--acc);flex-shrink:0}
+.sb-av.prod-av{border-color:var(--product)}.sb-av.exp-av{border-color:var(--expense)}
+.sb-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px}
+.sb-date{font-size:12px;color:var(--muted);margin-top:2px}
+.etype-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px}
+
+/* FORM */
+.flbl{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.fsec{margin-bottom:20px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:9px}
+.chip{padding:9px 8px;border-radius:10px;border:1px solid var(--b);background:var(--s1);cursor:pointer;font-size:13px;font-weight:500;text-align:center;transition:all .13s;user-select:none}
+.chip .cp{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+.chip.sel{border-color:var(--acc);background:rgba(34,211,168,.1);color:var(--acc)}.chip.sel .cp{color:rgba(34,211,168,.7)}
+.chip.sel-p{border-color:var(--product);background:rgba(167,139,250,.1);color:var(--product)}
+.chip:active{transform:scale(.95)}
+.div{display:flex;align-items:center;gap:9px;margin:12px 0}
+.div-line{flex:1;height:1px;background:var(--b)}.div-txt{font-size:11px;color:var(--muted)}
+.fi{width:100%;padding:12px 14px;background:var(--s1);border:1px solid var(--b);border-radius:var(--r);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--acc)}.fi::placeholder{color:var(--muted)}
+.amt-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}.amt-row.one{grid-template-columns:1fr}
+.amt-wrap{position:relative}
+.rupee{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+.amt-wrap .fi{padding-left:29px}
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pbtn{padding:13px 7px;border-radius:var(--r);border:1px solid var(--b);background:var(--s1);cursor:pointer;font-size:13px;font-weight:500;text-align:center;transition:all .13s;user-select:none}
+.pbtn .pi{font-size:19px;display:block;margin-bottom:4px}.pbtn:active{transform:scale(.95)}
+.pbtn.pc{border-color:var(--cash);background:rgba(34,211,168,.1);color:var(--cash)}
+.pbtn.po{border-color:var(--online);background:rgba(129,140,248,.1);color:var(--online)}
+.pbtn.pu{border-color:var(--upi);background:rgba(251,146,60,.1);color:var(--upi)}
+.sub-btn{width:100%;padding:16px;border-radius:13px;background:var(--acc);color:#08090d;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;border:none;cursor:pointer;transition:all .15s;margin-top:9px;display:flex;align-items:center;justify-content:center;gap:7px}
+.sub-btn.prod-clr{background:var(--product)}.sub-btn.exp-clr{background:var(--expense)}
+.sub-btn:active{opacity:.85;transform:scale(.98)}.sub-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+
+/* MY LOG */
+.log-sum{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:18px}
+.ls-card{background:var(--s1);border:1px solid var(--b);border-radius:13px;padding:14px}
+.ls-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.ls-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.ls-val.g{color:var(--acc)}.ls-val.y{color:var(--warn)}
+.log-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.log-act-btn{padding:12px;border-radius:11px;border:1px solid var(--b2);background:var(--s2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--txt);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .13s}
+.log-act-btn:active{transform:scale(.97)}
+.log-act-btn.csv{border-color:rgba(34,211,168,.3);color:var(--acc)}
+.log-act-btn.mail{border-color:rgba(129,140,248,.3);color:var(--purple)}
+.elist{display:flex;flex-direction:column;gap:9px}
+.eitem{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.edot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.edot.c{background:var(--cash)}.edot.o{background:var(--online)}.edot.u{background:var(--upi)}
+.einfo{flex:1;min-width:0}
+.esvc{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.etime{font-size:11px;color:var(--muted);margin-top:1px}
+.eamt{text-align:right;flex-shrink:0}
+.eamt-v{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--acc)}
+.etip{font-size:11px;color:var(--warn);margin-top:1px}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-ic{font-size:38px;margin-bottom:8px;opacity:.5}
+
+/* BOTTOM NAV */
+.bnav{flex-shrink:0;display:none;border-top:1px solid var(--b);background:var(--s1);padding-bottom:env(safe-area-inset-bottom,0)}
+.bnav.vis{display:flex}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:11px 4px;cursor:pointer;color:var(--muted);font-size:11px;user-select:none}
+.ni.on{color:var(--acc)}.ni svg{width:20px;height:20px}
+
+/* SUCCESS POPUP */
+.popup-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:500;padding:24px}
+.popup-ov.open{display:flex;animation:fdin .2s ease}
+@keyframes fdin{from{opacity:0}to{opacity:1}}
+.popup-box{background:var(--s1);border:1px solid rgba(34,211,168,.25);border-radius:22px;padding:30px 26px;text-align:center;max-width:340px;width:100%}
+.popup-ic{font-size:48px;margin-bottom:12px}
+.popup-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--acc);margin-bottom:7px}
+.popup-msg{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.popup-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.popup-btn-add{padding:13px;background:var(--acc);color:#08090d;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.popup-btn-back{padding:13px;background:transparent;border:1px solid var(--b2);color:var(--txt);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer}
+
+/* TOAST & LOADER */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--acc);color:#08090d;padding:10px 20px;border-radius:50px;font-weight:600;font-size:13px;opacity:0;transition:all .26s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.err{background:var(--danger);color:#fff}
+.ld{display:flex;align-items:center;justify-content:center;padding:40px 20px;color:var(--muted);gap:9px}
+.sp{width:17px;height:17px;border:2px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-brand" id="brand-logo">Green <em>Salon</em></div>
+  <div class="bar-mid" id="bar-branch" style="display:none">
+    <div class="branch-dot"></div><span id="branch-name-top"></span>
+  </div>
+  <div class="bar-right">
+    <div class="bar-time" id="bar-time"></div>
+    <button class="btn-change" id="btn-change" onclick="showChangeBranch()">⚙</button>
+  </div>
+</div>
+
+<div class="screens">
+
+<!-- SETUP -->
+<div class="scr on" id="s-setup">
+  <div class="setup-wrap">
+    <div class="setup-icon">🔧</div>
+    <div class="setup-title">Setup This Tablet</div>
+    <div class="setup-sub">Owner does this once. After locking, staff always see the main panel.</div>
+    <div style="text-align:left">
+      <label class="sf-lbl">Apps Script API URL</label>
+      <input class="sf-input" id="setup-url" type="text" placeholder="https://script.google.com/macros/s/.../exec" oninput="onUrlInput(this.value)">
+      <div class="sf-hint">Must start with <code>https://script.google.com</code><br>From: Apps Script → Deploy → Manage Deployments</div>
+      <div class="url-preview" id="url-preview">✓ URL: <span id="url-preview-text"></span></div>
+      <label class="sf-lbl">Select Branch</label>
+      <select class="sf-sel" id="setup-branch">
+        <option value="">-- Select branch --</option>
+        <option value="branch1">Branch 1</option>
+        <option value="branch2">Branch 2</option>
+        <option value="branch3">Branch 3</option>
+      </select>
+      <label class="sf-lbl">Branch Display Name</label>
+      <input class="sf-input" id="setup-bname" placeholder="e.g. JC Nagar Green Salon">
+      <label class="sf-lbl">Staff Email (for My Log email)</label>
+      <input class="sf-input" id="setup-email" type="email" placeholder="staff@gmail.com (optional)">
+      <button class="btn-lock" onclick="saveSetup()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Lock This Tablet to Branch
+      </button>
+    </div>
+    <div class="setup-err info" id="setup-err"></div>
+    <div class="setup-note">Owners only. Long-press logo 3 sec to return here.</div>
+  </div>
+</div>
+
+<!-- MAIN LANDING — Summary card + Staff grid + Global cards -->
+<div class="scr" id="s-grid">
+  <!-- Branch summary card -->
+  <div class="summary-card" id="summary-card">
+    <div class="sum-top">
+      <span class="sum-label">📊 Today's Summary</span>
+      <span class="sum-date" id="sum-date"></span>
+    </div>
+    <div class="sum-stats">
+      <div class="sum-stat">
+        <div class="sum-stat-v" id="sum-entries">—</div>
+        <div class="sum-stat-l">Entries</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sum-stat-v" id="sum-revenue">—</div>
+        <div class="sum-stat-l">Revenue</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sum-stat-v" id="sum-tips">—</div>
+        <div class="sum-stat-l">Tips</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff grid -->
+  <div class="grid-hdr">
+    <div class="grid-title">Who are you?</div>
+    <div class="grid-sub">Tap your name to add a service</div>
+  </div>
+  <div class="staff-grid" id="staff-grid"><div class="ld"><div class="sp"></div></div></div>
+
+  <!-- Global cards — Product and Expense at branch level -->
+  <div class="global-title">Branch Actions</div>
+  <div class="global-cards">
+    <div class="gcard prod" onclick="openGlobalForm('product')">
+      <div class="gcard-ic">🧴</div>
+      <div><div class="gcard-name">Product</div><div class="gcard-desc">Branch-level sale</div></div>
+    </div>
+    <div class="gcard exp" onclick="openGlobalForm('expense')">
+      <div class="gcard-ic">💸</div>
+      <div><div class="gcard-name">Expense</div><div class="gcard-desc">Branch expense</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICE FORM (staff-level — only service) -->
+<div class="scr" id="s-service">
+  <div class="wrap">
+    <span class="back-btn" onclick="goGrid()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to Staff
+    </span>
+    <div class="staff-bar"><div class="sb-av" id="sf-av"></div><div><div class="sb-name" id="sf-name"></div><div class="sb-date" id="sf-date"></div></div></div>
+    <div class="fsec">
+      <span class="flbl">Service</span>
+      <div class="svc-grid" id="svc-grid"><div class="ld"><div class="sp"></div></div></div>
+      <div class="div"><div class="div-line"></div><div class="div-txt">or type custom</div><div class="div-line"></div></div>
+      <input class="fi" id="custom-svc" placeholder="Custom service name..." oninput="onCustomSvc(this.value)">
+    </div>
+    <div class="fsec">
+      <span class="flbl">Amount &amp; Tip</span>
+      <div class="amt-row">
+        <div class="amt-wrap"><span class="rupee">₹</span><input type="number" class="fi" id="svc-amt" placeholder="0" inputmode="numeric" oninput="chkSvc()"></div>
+        <div class="amt-wrap"><span class="rupee">₹</span><input type="number" class="fi" id="svc-tip" placeholder="Tip (optional)" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div class="fsec">
+      <span class="flbl">Payment Method</span>
+      <div class="pay-grid">
+        <div class="pbtn" id="sp-Cash" onclick="selPay('svc','Cash')"><span class="pi">💵</span>Cash</div>
+        <div class="pbtn" id="sp-Online" onclick="selPay('svc','Online')"><span class="pi">💳</span>Online</div>
+        <div class="pbtn" id="sp-UPI" onclick="selPay('svc','UPI')"><span class="pi">📱</span>UPI</div>
+      </div>
+    </div>
+    <button class="sub-btn" id="svc-sub" onclick="subService()" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Service
+    </button>
+  </div>
+</div>
+
+<!-- GLOBAL PRODUCT FORM -->
+<div class="scr" id="s-product">
+  <div class="wrap">
+    <span class="back-btn" onclick="goGrid()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+    </span>
+    <div class="staff-bar">
+      <div class="sb-av prod-av">🧴</div>
+      <div><div class="sb-name" style="color:var(--product)">Product Sale</div><div class="sb-date" id="pf-date"></div></div>
+    </div>
+    <div class="fsec">
+      <span class="flbl">Product</span>
+      <div class="svc-grid" id="prod-grid"><div class="ld"><div class="sp"></div></div></div>
+      <div class="div"><div class="div-line"></div><div class="div-txt">or type custom</div><div class="div-line"></div></div>
+      <input class="fi" id="custom-prod" placeholder="Custom product name..." oninput="onCustomProd(this.value)">
+    </div>
+    <div class="fsec">
+      <span class="flbl">Amount</span>
+      <div class="amt-row one"><div class="amt-wrap"><span class="rupee">₹</span><input type="number" class="fi" id="prod-amt" placeholder="0" inputmode="numeric" oninput="chkProd()"></div></div>
+    </div>
+    <div class="fsec">
+      <span class="flbl">Payment Method</span>
+      <div class="pay-grid">
+        <div class="pbtn" id="pp-Cash" onclick="selPay('prod','Cash')"><span class="pi">💵</span>Cash</div>
+        <div class="pbtn" id="pp-Online" onclick="selPay('prod','Online')"><span class="pi">💳</span>Online</div>
+        <div class="pbtn" id="pp-UPI" onclick="selPay('prod','UPI')"><span class="pi">📱</span>UPI</div>
+      </div>
+    </div>
+    <button class="sub-btn prod-clr" id="prod-sub" onclick="subProduct()" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Product Sale
+    </button>
+  </div>
+</div>
+
+<!-- GLOBAL EXPENSE FORM -->
+<div class="scr" id="s-expense">
+  <div class="wrap">
+    <span class="back-btn" onclick="goGrid()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+    </span>
+    <div class="staff-bar">
+      <div class="sb-av exp-av">💸</div>
+      <div><div class="sb-name" style="color:var(--expense)">Branch Expense</div><div class="sb-date" id="xf-date"></div></div>
+    </div>
+    <div class="fsec">
+      <span class="flbl">Expense Description</span>
+      <input class="fi" id="exp-desc" placeholder="e.g. Towels, electricity bill..." oninput="chkExp()">
+    </div>
+    <div class="fsec">
+      <span class="flbl">Amount</span>
+      <div class="amt-row one"><div class="amt-wrap"><span class="rupee">₹</span><input type="number" class="fi" id="exp-amt" placeholder="0" inputmode="numeric" oninput="chkExp()"></div></div>
+    </div>
+    <div class="fsec">
+      <span class="flbl">Payment Method</span>
+      <div class="pay-grid">
+        <div class="pbtn" id="xp-Cash" onclick="selPay('exp','Cash')"><span class="pi">💵</span>Cash</div>
+        <div class="pbtn" id="xp-Online" onclick="selPay('exp','Online')"><span class="pi">💳</span>Online</div>
+        <div class="pbtn" id="xp-UPI" onclick="selPay('exp','UPI')"><span class="pi">📱</span>UPI</div>
+      </div>
+    </div>
+    <button class="sub-btn exp-clr" id="exp-sub" onclick="subExpense()" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Expense
+    </button>
+  </div>
+</div>
+
+<!-- MY LOG (staff services only + CSV/email) -->
+<div class="scr" id="s-log">
+  <div class="wrap">
+    <span class="back-btn" onclick="goGrid()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to Staff
+    </span>
+    <div class="grid-hdr" style="margin-bottom:16px">
+      <div class="grid-title" id="log-title">My Log</div>
+      <div class="grid-sub" id="log-sub">Today's entries</div>
+    </div>
+    <div class="log-sum">
+      <div class="ls-card"><div class="ls-lbl">Revenue</div><div class="ls-val g" id="log-svc">₹0</div></div>
+      <div class="ls-card"><div class="ls-lbl">Tips</div><div class="ls-val y" id="log-tip">₹0</div></div>
+    </div>
+    <div class="log-actions">
+      <button class="log-act-btn csv" onclick="downloadCSV()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Download CSV
+      </button>
+      <button class="log-act-btn mail" onclick="emailLog()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Send Email
+      </button>
+    </div>
+    <div id="elist"><div class="ld"><div class="sp"></div></div></div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+
+<div class="bnav" id="bnav">
+  <div class="ni on" id="ni-add" onclick="switchTab('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Add Service
+  </div>
+  <div class="ni" id="ni-log" onclick="switchTab('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>My Log
+  </div>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div class="popup-ov" id="success-popup">
+  <div class="popup-box">
+    <div class="popup-ic">✅</div>
+    <div class="popup-title" id="popup-title">Saved!</div>
+    <div class="popup-msg" id="popup-msg">Saved to Google Sheet.</div>
+    <div class="popup-btns">
+      <button class="popup-btn-add" onclick="popupAddAnother()">+ Add Another</button>
+      <button class="popup-btn-back" onclick="popupGoBack()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+const LS_URL='gs_url', LS_BID='gs_bid', LS_BN='gs_bname', LS_LOCKED='gs_locked', LS_EMAIL='gs_email';
+function lsGet(k){return localStorage.getItem(k)||'';}
+function lsSet(k,v){localStorage.setItem(k,v);}
+
+let cfg={url:lsGet(LS_URL),bid:lsGet(LS_BID),bname:lsGet(LS_BN),email:lsGet(LS_EMAIL)};
+const locked=lsGet(LS_LOCKED)==='yes';
+
+const S={
+  staff:[],services:[],products:[],sel:null,
+  svcSvc:null,svcPay:null,prodProd:null,prodPay:null,expPay:null,
+  lastForm:'service', logData:null
+};
+
+// ── BOOT ──────────────────────────────────────────────────────
+window.onload=()=>{
+  tick(); setInterval(tick,30000); fillDates();
+  if(cfg.url&&cfg.bid&&cfg.bname&&locked){showBranchTag();boot();}
+  else show('s-setup');
+  let pt;
+  const logo=document.getElementById('brand-logo');
+  logo.addEventListener('touchstart',()=>{pt=setTimeout(()=>{document.getElementById('btn-change').style.display='block';},3000);});
+  logo.addEventListener('touchend',()=>clearTimeout(pt));
+  logo.addEventListener('touchmove',()=>clearTimeout(pt));
+  document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&e.key==='O')showChangeBranch();});
+};
+
+function tick(){document.getElementById('bar-time').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+function fillDates(){
+  const d=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  ['sf-date','pf-date','xf-date'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=d;});
+  document.getElementById('sum-date').textContent=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+// ── API ────────────────────────────────────────────────────────
+async function GET(a){
+  const r=await fetch(`${cfg.url}?action=${a}&branchId=${cfg.bid}`);
+  const ct=r.headers.get('content-type')||'';
+  if(!ct.includes('json')&&!ct.includes('plain')) throw new Error('API returned HTML — check deployment settings');
+  return r.json();
+}
+async function POST(b){
+  const r=await fetch(cfg.url,{method:'POST',body:JSON.stringify({...b,branchId:cfg.bid})});
+  const ct=r.headers.get('content-type')||'';
+  if(!ct.includes('json')&&!ct.includes('plain')) throw new Error('API returned HTML — check deployment settings');
+  return r.json();
+}
+
+// ── URL VALIDATION ─────────────────────────────────────────────
+function sanitiseUrl(raw){
+  let url=raw.trim().replace(/[\r\n\t]/g,'');
+  if(url.startsWith('AKfycb')) url='https://script.google.com/macros/s/'+url+'/exec';
+  if(url.includes('googleusercontent.com')) return null;
+  if(!url.startsWith('https://script.google.com')) return null;
+  if(!url.endsWith('/exec')){if(url.endsWith('/'))url=url.slice(0,-1);url=url+'/exec';}
+  return url;
+}
+function onUrlInput(raw){
+  const clean=sanitiseUrl(raw);
+  const prev=document.getElementById('url-preview'),pt=document.getElementById('url-preview-text'),err=document.getElementById('setup-err');
+  if(!raw.trim()){prev.classList.remove('show');err.textContent='';err.className='setup-err info';return;}
+  if(raw.includes('googleusercontent.com')){prev.classList.remove('show');err.textContent='⚠️ Wrong URL — use Apps Script → Deploy → Manage Deployments';err.className='setup-err err';return;}
+  if(clean){pt.textContent=clean;prev.classList.add('show');err.textContent='✓ URL format correct';err.className='setup-err ok';}
+  else{prev.classList.remove('show');err.textContent='⚠️ Must start with https://script.google.com';err.className='setup-err err';}
+}
+
+// ── SETUP ──────────────────────────────────────────────────────
+function showChangeBranch(){
+  document.getElementById('setup-url').value=cfg.url||'';
+  document.getElementById('setup-branch').value=cfg.bid||'';
+  document.getElementById('setup-bname').value=cfg.bname||'';
+  document.getElementById('setup-email').value=cfg.email||'';
+  if(cfg.url)onUrlInput(cfg.url);
+  document.getElementById('setup-err').textContent='Update settings and lock again.';
+  document.getElementById('setup-err').className='setup-err info';
+  document.getElementById('bnav').classList.remove('vis');
+  show('s-setup');
+}
+
+async function saveSetup(){
+  const rawUrl=document.getElementById('setup-url').value;
+  const bid=document.getElementById('setup-branch').value;
+  const bn=document.getElementById('setup-bname').value.trim();
+  const email=document.getElementById('setup-email').value.trim();
+  const errEl=document.getElementById('setup-err');
+  errEl.className='setup-err err';
+  if(!rawUrl.trim()){errEl.textContent='Please enter API URL';return;}
+  if(!bid){errEl.textContent='Please select a branch';return;}
+  if(!bn){errEl.textContent='Please enter branch display name';return;}
+  const url=sanitiseUrl(rawUrl);
+  if(!url){errEl.textContent=rawUrl.includes('googleusercontent.com')?'❌ Wrong URL — copy from Manage Deployments':'❌ Invalid URL format';return;}
+  errEl.className='setup-err info';errEl.textContent='Connecting...';
+  try{
+    const r=await fetch(`${url}?action=getStaff&branchId=${bid}`);
+    const ct=r.headers.get('content-type')||'';
+    if(!ct.includes('json')&&!ct.includes('plain')) throw new Error('HTML returned — check Execute as Me, Anyone access');
+    const d=await r.json();
+    if(!d.success) throw new Error(d.error||'Server error');
+    lsSet(LS_URL,url);lsSet(LS_BID,bid);lsSet(LS_BN,bn);lsSet(LS_LOCKED,'yes');lsSet(LS_EMAIL,email);
+    cfg={url,bid,bname:bn,email};
+    showBranchTag();
+    S.staff=d.staff||[];S.sel=null;
+    renderGrid();
+    await loadServices();await loadProducts();
+    loadSummary();
+    show('s-grid');
+    document.getElementById('bnav').classList.remove('vis');
+    document.getElementById('btn-change').style.display='none';
+    toast('Tablet locked to '+bn+' ✓');
+  }catch(ex){
+    errEl.className='setup-err err';
+    errEl.textContent='❌ '+(ex.message.includes('JSON')||ex.message.includes('DOCTYPE')
+      ?'Connection failed — check deployment has "Anyone" access and URL ends with /exec'
+      :ex.message);
+  }
+}
+
+function showBranchTag(){
+  document.getElementById('branch-name-top').textContent=cfg.bname;
+  document.getElementById('bar-branch').style.display='flex';
+}
+
+async function boot(){
+  try{await loadStaff();await loadServices();await loadProducts();loadSummary();show('s-grid');}
+  catch(ex){toast('Load error: '+ex.message,true);show('s-setup');}
+}
+async function loadStaff(){const d=await GET('getStaff');if(d.success){S.staff=d.staff||[];renderGrid();}}
+async function loadServices(){try{const d=await GET('getServices');if(d.success)S.services=d.services||[];}catch(ex){S.services=[{name:'Haircut',price:150},{name:'Shave',price:80},{name:'Facial',price:300},{name:'Hair Colour',price:500},{name:'Head Massage',price:100},{name:'Beard Trim',price:60}];}}
+async function loadProducts(){try{const d=await GET('getProducts');if(d.success)S.products=d.products||[];}catch(ex){S.products=[{name:'Shampoo',price:200},{name:'Hair Oil',price:150}];}}
+
+// ── SUMMARY CARD ───────────────────────────────────────────────
+async function loadSummary(){
+  try{
+    const d=await POST({action:'getBranchSummary'});
+    if(d.success){
+      document.getElementById('sum-entries').textContent=d.totalEntries||0;
+      document.getElementById('sum-revenue').textContent='₹'+(d.totalRevenue||0);
+      document.getElementById('sum-tips').textContent='₹'+(d.totalTips||0);
+    }
+  }catch(ex){}
+}
+
+// ── STAFF GRID ─────────────────────────────────────────────────
+function renderGrid(){
+  const g=document.getElementById('staff-grid');
+  if(!S.staff.length){g.innerHTML='<div class="ld" style="grid-column:1/-1;flex-direction:column;gap:10px;color:var(--muted)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div style="text-align:center">No staff yet. Add from Owner Panel.</div></div>';return;}
+  g.innerHTML=S.staff.map(s=>`<div class="scard" onclick="selStaff('${s.id}')">
+    <div class="scard-av">${s.name[0].toUpperCase()}</div>
+    <div class="scard-name">${s.name}</div>
+    <span class="scard-badge ${s.hasCommission?'comm':'nocomm'}">${s.hasCommission?'Comm':'Fixed'}</span>
+  </div>`).join('');
+}
+
+// ── SELECT STAFF → Service form only ──────────────────────────
+function selStaff(id){
+  S.sel=S.staff.find(s=>s.id===id);if(!S.sel)return;
+  const av=S.sel.name[0].toUpperCase();
+  document.getElementById('sf-av').textContent=av;
+  document.getElementById('sf-name').textContent=S.sel.name;
+  fillDates();
+  // Go directly to service form — no type picker needed
+  openSvcForm();
+  document.getElementById('bnav').classList.add('vis');
+  document.getElementById('ni-add').classList.add('on');
+  document.getElementById('ni-log').classList.remove('on');
+}
+
+function goGrid(){
+  S.sel=null;
+  show('s-grid');
+  document.getElementById('bnav').classList.remove('vis');
+  loadStaff();
+  loadSummary(); // refresh summary when returning
+}
+
+// ── SERVICE FORM ───────────────────────────────────────────────
+function openSvcForm(){
+  S.svcSvc=null;S.svcPay=null;
+  document.getElementById('svc-amt').value='';document.getElementById('svc-tip').value='';
+  document.getElementById('custom-svc').value='';
+  document.querySelectorAll('#s-service .chip').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('#s-service .pbtn').forEach(b=>b.className='pbtn');
+  renderServices();chkSvc();show('s-service');S.lastForm='service';
+}
+
+function renderServices(){
+  document.getElementById('svc-grid').innerHTML=S.services.map(s=>
+    `<div class="chip" id="cs-${s.name.replace(/\s+/g,'_')}" onclick="selSvc('${s.name}',${s.price})">${s.name}<span class="cp">₹${s.price}</span></div>`
+  ).join('');
+}
+
+function selSvc(n,p){S.svcSvc=n;document.getElementById('custom-svc').value='';document.querySelectorAll('#s-service .chip').forEach(c=>c.classList.remove('sel'));const e=document.getElementById('cs-'+n.replace(/\s+/g,'_'));if(e)e.classList.add('sel');document.getElementById('svc-amt').value=p;chkSvc();}
+function onCustomSvc(v){S.svcSvc=v.trim()||null;document.querySelectorAll('#s-service .chip').forEach(c=>c.classList.remove('sel'));chkSvc();}
+function chkSvc(){document.getElementById('svc-sub').disabled=!(S.svcSvc&&document.getElementById('svc-amt').value>0&&S.svcPay);}
+
+// ── GLOBAL PRODUCT / EXPENSE ───────────────────────────────────
+function openGlobalForm(type){
+  if(type==='product'){
+    S.prodProd=null;S.prodPay=null;
+    document.getElementById('prod-amt').value='';document.getElementById('custom-prod').value='';
+    document.querySelectorAll('#s-product .chip').forEach(c=>c.classList.remove('sel-p'));
+    document.querySelectorAll('#s-product .pbtn').forEach(b=>b.className='pbtn');
+    renderProducts();chkProd();show('s-product');S.lastForm='product';
+  }else{
+    S.expPay=null;
+    document.getElementById('exp-desc').value='';document.getElementById('exp-amt').value='';
+    document.querySelectorAll('#s-expense .pbtn').forEach(b=>b.className='pbtn');
+    chkExp();show('s-expense');S.lastForm='expense';
+  }
+}
+
+function renderProducts(){
+  document.getElementById('prod-grid').innerHTML=S.products.map(p=>
+    `<div class="chip" id="cp-${p.name.replace(/\s+/g,'_')}" onclick="selProd('${p.name}',${p.price})">${p.name}<span class="cp">₹${p.price}</span></div>`
+  ).join('');
+}
+function selProd(n,p){S.prodProd=n;document.getElementById('custom-prod').value='';document.querySelectorAll('#s-product .chip').forEach(c=>c.classList.remove('sel-p'));const e=document.getElementById('cp-'+n.replace(/\s+/g,'_'));if(e)e.classList.add('sel-p');document.getElementById('prod-amt').value=p;chkProd();}
+function onCustomProd(v){S.prodProd=v.trim()||null;document.querySelectorAll('#s-product .chip').forEach(c=>c.classList.remove('sel-p'));chkProd();}
+function chkProd(){document.getElementById('prod-sub').disabled=!(S.prodProd&&document.getElementById('prod-amt').value>0&&S.prodPay);}
+function chkExp(){document.getElementById('exp-sub').disabled=!(document.getElementById('exp-desc').value.trim()&&document.getElementById('exp-amt').value>0&&S.expPay);}
+
+function selPay(pre,m){
+  if(pre==='svc'){S.svcPay=m;chkSvc();}
+  else if(pre==='prod'){S.prodPay=m;chkProd();}
+  else{S.expPay=m;chkExp();}
+  const mc=m[0].toLowerCase(),cls=mc==='c'?'pc':mc==='o'?'po':'pu';
+  const ids={svc:['sp-Cash','sp-Online','sp-UPI'],prod:['pp-Cash','pp-Online','pp-UPI'],exp:['xp-Cash','xp-Online','xp-UPI']};
+  ids[pre].forEach(id=>{const e=document.getElementById(id);if(e)e.className='pbtn';});
+  document.getElementById(ids[pre][m==='Cash'?0:m==='Online'?1:2]).classList.add(cls);
+}
+
+// ── SUBMIT ─────────────────────────────────────────────────────
+async function subService(){
+  const btn=document.getElementById('svc-sub');
+  btn.disabled=true;btn.innerHTML='<div class="sp" style="border-top-color:#08090d"></div> Saving...';
+  try{
+    const d=await POST({action:'submitEntry',staffId:S.sel.id,staffName:S.sel.name,
+      service:S.svcSvc,amount:document.getElementById('svc-amt').value,
+      tip:document.getElementById('svc-tip').value||0,paymentMethod:S.svcPay});
+    if(d.success){
+      document.getElementById('popup-title').textContent='Service Saved!';
+      document.getElementById('popup-msg').textContent=S.svcSvc+' ₹'+document.getElementById('svc-amt').value+' saved for '+S.sel.name;
+      document.getElementById('success-popup').classList.add('open');
+      loadSummary();
+    }else toast('Error: '+(d.error||'unknown'),true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+  btn.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Service';
+  chkSvc();
+}
+
+async function subProduct(){
+  const btn=document.getElementById('prod-sub');
+  btn.disabled=true;btn.innerHTML='<div class="sp" style="border-top-color:#fff"></div> Saving...';
+  try{
+    const d=await POST({action:'submitProduct',product:S.prodProd,amount:document.getElementById('prod-amt').value,paymentMethod:S.prodPay});
+    if(d.success){
+      document.getElementById('popup-title').textContent='Product Saved!';
+      document.getElementById('popup-msg').textContent=S.prodProd+' ₹'+document.getElementById('prod-amt').value+' saved to Sheet';
+      document.getElementById('success-popup').classList.add('open');
+      loadSummary();
+    }else toast('Error: '+(d.error||'unknown'),true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+  btn.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Product Sale';
+  chkProd();
+}
+
+async function subExpense(){
+  const btn=document.getElementById('exp-sub');
+  const desc=document.getElementById('exp-desc').value.trim();
+  const amt=document.getElementById('exp-amt').value;
+  btn.disabled=true;btn.innerHTML='<div class="sp" style="border-top-color:#fff"></div> Saving...';
+  try{
+    const d=await POST({action:'submitExpense',description:desc,amount:amt,paymentMethod:S.expPay});
+    if(d.success){
+      document.getElementById('popup-title').textContent='Expense Saved!';
+      document.getElementById('popup-msg').textContent=desc+' ₹'+amt+' saved to Sheet';
+      document.getElementById('success-popup').classList.add('open');
+      loadSummary();
+    }else toast('Error: '+(d.error||'unknown'),true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+  btn.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Submit Expense';
+  chkExp();
+}
+
+function popupAddAnother(){
+  document.getElementById('success-popup').classList.remove('open');
+  if(S.lastForm==='service'&&S.sel)openSvcForm();
+  else if(S.lastForm==='product')openGlobalForm('product');
+  else openGlobalForm('expense');
+}
+function popupGoBack(){
+  document.getElementById('success-popup').classList.remove('open');
+  goGrid();
+}
+
+// ── MY LOG ─────────────────────────────────────────────────────
+async function loadLog(){
+  document.getElementById('elist').innerHTML='<div class="ld"><div class="sp"></div> Loading...</div>';
+  try{
+    const d=await POST({action:'getMyEntries',staffId:S.sel.id});
+    if(d.success){S.logData=d;renderLog(d);}
+  }catch(ex){document.getElementById('elist').innerHTML='<div class="empty"><div class="empty-ic">📋</div><div>Could not load</div></div>';}
+}
+
+function renderLog(d){
+  document.getElementById('log-title').textContent=S.sel.name+"'s Log";
+  const tot=(d.entries||[]).length;
+  document.getElementById('log-sub').textContent=tot+' entr'+(tot!==1?'ies':'y')+' today';
+  document.getElementById('log-svc').textContent='₹'+(d.totalAmount||0);
+  document.getElementById('log-tip').textContent='₹'+(d.totalTip||0);
+  const el=document.getElementById('elist');
+  if(!tot){el.innerHTML='<div class="empty"><div class="empty-ic">📋</div><div>No entries yet today</div></div>';return;}
+  el.innerHTML=d.entries.map(e=>{
+    const dc=e.paymentMethod==='Cash'?'c':e.paymentMethod==='UPI'?'u':'o';
+    const t=(e.timestamp||'').split(' ')[1]||'';
+    return `<div class="eitem"><div class="edot ${dc}"></div><div class="einfo"><div class="esvc">${e.service}</div><div class="etime">${t} · ${e.paymentMethod}</div></div><div class="eamt"><div class="eamt-v">₹${e.amount}</div>${Number(e.tip)>0?`<div class="etip">+₹${e.tip} tip</div>`:''}</div></div>`;
+  }).join('');
+}
+
+// CSV download — today's entries for this staff
+function downloadCSV(){
+  if(!S.sel||!S.logData||!S.logData.entries||!S.logData.entries.length){toast('No entries to download',true);return;}
+  const rows=[['DateTime','Service','Amount','Tip','Payment']];
+  S.logData.entries.forEach(e=>rows.push([e.timestamp||'',e.service||'',e.amount||0,e.tip||0,e.paymentMethod||'']));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const dt=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.download=`${S.sel.name}_Log_${dt}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded ✓');
+}
+
+// Email log — uses mailto fallback (Apps Script email from staff side not possible without server-side call)
+function emailLog(){
+  if(!S.sel||!S.logData||!S.logData.entries||!S.logData.entries.length){toast('No entries to email',true);return;}
+  const email=cfg.email||'';
+  if(!email){toast('No email set. Go to Setup and add staff email.',true);return;}
+  const dt=new Date().toLocaleDateString('en-IN');
+  let body=`My Log — ${S.sel.name} — ${dt}\n\n`;
+  body+=`Total Revenue: ₹${S.logData.totalAmount||0}\nTotal Tips: ₹${S.logData.totalTip||0}\n\n`;
+  body+=`ENTRIES:\n`;
+  (S.logData.entries||[]).forEach(e=>{body+=`• ${e.service} — ₹${e.amount}${Number(e.tip)>0?' (tip ₹'+e.tip+')':''} — ${e.paymentMethod}\n`;});
+  const subject=encodeURIComponent(`Green Salon — ${cfg.bname} — ${S.sel.name} — ${dt}`);
+  const bodyEncoded=encodeURIComponent(body);
+  window.open(`mailto:${email}?subject=${subject}&body=${bodyEncoded}`);
+  toast('Email client opened ✓');
+}
+
+// ── NAV ────────────────────────────────────────────────────────
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function switchTab(t){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  if(t==='add'){
+    if(S.sel)openSvcForm();else show('s-grid');
+    document.getElementById('ni-add').classList.add('on');
+  }else{
+    show('s-log');document.getElementById('ni-log').classList.add('on');
+    if(S.sel)loadLog();
+  }
+}
+function toast(msg,isErr){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show'+(isErr?' err':'');
+  setTimeout(()=>t.className='toast',2800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090d">
+<title>Green Salon — Owner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080c;--s1:#0e0f16;--s2:#161720;--s3:#1e1f2c;--b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);--acc:#22d3a8;--warn:#f59e0b;--danger:#f43f5e;--purple:#818cf8;--product:#a78bfa;--txt:#eeeef5;--muted:#6b6b8a;--dim:#9898b8;--cash:#22d3a8;--online:#818cf8;--upi:#fb923c;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.lbox{background:var(--s1);border:1px solid var(--b);border-radius:22px;padding:42px 36px;width:100%;max-width:420px;text-align:center}
+.llogo{font-family:'Syne',sans-serif;font-size:27px;font-weight:800;margin-bottom:5px}.llogo em{color:var(--acc);font-style:normal}
+.lsub{color:var(--muted);font-size:14px;margin-bottom:36px}
+.llbl{display:block;text-align:left;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.linput{width:100%;padding:13px 15px;background:var(--s2);border:1px solid var(--b);border-radius:11px;color:var(--txt);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;transition:border-color .2s}.linput:focus{border-color:var(--acc)}
+.lbtn{width:100%;padding:15px;background:var(--acc);color:#07080c;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer}.lbtn:hover{opacity:.9}
+.lerr{color:var(--danger);font-size:13px;margin-top:10px;min-height:18px}
+#app{display:none}
+.layout{display:flex;min-height:100vh}
+.side{width:218px;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:50;overflow-y:auto}
+.side-top{padding:20px 16px 16px;border-bottom:1px solid var(--b)}
+.side-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}.side-logo em{color:var(--acc);font-style:normal}
+.side-owner{font-size:11px;color:var(--muted);margin-top:2px}
+.side-nav{padding:10px 8px;flex:1}
+.snav-sec{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:9px 8px 5px;margin-top:4px}
+.nl{display:flex;align-items:center;gap:8px;padding:9px 10px;color:var(--dim);font-size:13px;cursor:pointer;border-radius:9px;transition:all .12s;user-select:none}
+.nl:hover{color:var(--txt);background:rgba(255,255,255,.04)}.nl.on{color:var(--acc);background:rgba(34,211,168,.09)}
+.nl svg{width:15px;height:15px;flex-shrink:0}
+.side-bot{padding:13px 16px;border-top:1px solid var(--b)}
+.logout{color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px}.logout:hover{color:var(--danger)}
+.content{margin-left:218px;padding:26px;min-height:100vh}
+.pg{display:none}.pg.on{display:block;animation:fi .17s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:14px;flex-wrap:wrap}
+.ptitle{font-family:'Syne',sans-serif;font-size:23px;font-weight:700}
+.psub{font-size:13px;color:var(--muted);margin-top:2px}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;display:inline-flex;align-items:center;gap:5px;transition:all .12s}
+.btn-acc{background:var(--acc);color:#07080c}.btn-acc:hover{opacity:.9}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--dim)}.btn-ghost:hover{color:var(--txt)}
+.btn-danger{background:rgba(244,63,94,.1);color:var(--danger);border:1px solid rgba(244,63,94,.22)}.btn-danger:hover{background:rgba(244,63,94,.2)}
+.btn-warn{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.22)}.btn-warn:hover{background:rgba(245,158,11,.2)}
+.btn-recover{background:rgba(34,211,168,.1);color:var(--acc);border:1px solid rgba(34,211,168,.22)}.btn-recover:hover{background:rgba(34,211,168,.2)}
+.btn-sm{padding:4px 11px;font-size:11px;border-radius:6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:22px}
+.sc{background:var(--s1);border:1px solid var(--b);border-radius:13px;padding:16px}
+.sc-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.sc-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.sc-val.g{color:var(--acc)}.sc-val.y{color:var(--warn)}.sc-val.p{color:var(--purple)}.sc-val.pr{color:var(--product)}.sc-val.r{color:var(--danger)}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:15px;overflow:hidden;margin-bottom:20px}
+.card-head{padding:13px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px}
+.card-body{padding:18px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:9px 18px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--b);font-weight:500}
+td{padding:10px 18px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.012)}
+.badge{display:inline-block;padding:2px 9px;border-radius:18px;font-size:11px;font-weight:500}
+.bc{background:rgba(34,211,168,.12);color:var(--cash)}.bo{background:rgba(129,140,248,.12);color:var(--online)}.bu{background:rgba(251,146,60,.12);color:var(--upi)}
+.flagged td{opacity:.38;text-decoration:line-through}
+.branch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:15px;margin-bottom:18px}
+.bcard{background:var(--s1);border:1px solid var(--b);border-radius:17px;padding:20px;transition:all .14s;position:relative;overflow:hidden}
+.bcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);opacity:0;transition:opacity .14s}
+.bcard-click{cursor:pointer}.bcard-click:hover{border-color:rgba(34,211,168,.3);transform:translateY(-2px)}.bcard-click:hover::before{opacity:1}
+.bcard-deleted{opacity:.6;border-style:dashed}
+.bcard-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.bcard-loc{font-size:12px;color:var(--muted);margin-bottom:14px}
+.bcard-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.bcs{background:var(--s2);border-radius:9px;padding:11px}
+.bcs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.bcs-val{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--acc)}
+.bcard-actions{display:flex;gap:7px;flex-wrap:wrap}
+.bcard-foot{font-size:10px;color:var(--muted);margin-top:10px;display:flex;align-items:center;justify-content:space-between}
+.copy-id{cursor:pointer;padding:2px 7px;border:1px solid var(--b);border-radius:4px;color:var(--dim)}.copy-id:hover{color:var(--acc);border-color:var(--acc)}
+.deleted-tag{display:inline-block;padding:2px 8px;border-radius:5px;background:rgba(244,63,94,.12);color:var(--danger);font-size:11px;margin-bottom:10px}
+.bc-nav{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-bottom:18px;flex-wrap:wrap}
+.bc-link{cursor:pointer;color:var(--dim)}.bc-link:hover{color:var(--acc)}.bc-sep{opacity:.4}
+/* Staff rows */
+.staff-row{display:flex;align-items:center;gap:11px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04)}
+.staff-row:last-child{border-bottom:none}.staff-row:hover{background:rgba(255,255,255,.018)}
+.sav{width:36px;height:36px;border-radius:50%;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--acc);flex-shrink:0}
+.sinfo{flex:1;min-width:0}
+.sname{font-weight:500;font-size:13px}.smeta{font-size:11px;color:var(--muted);margin-top:1px}
+/* Staff name edit inline */
+.sname-edit{display:none;flex:1;min-width:0}
+.sname-input{width:100%;padding:5px 9px;background:var(--s2);border:1px solid var(--acc);border-radius:7px;color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.sactions{display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap}
+.comm-tgl{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.comm-input{width:52px;padding:3px 6px;background:var(--s2);border:1px solid var(--b);border-radius:5px;color:var(--txt);font-size:12px;text-align:center;outline:none}.comm-input:focus{border-color:var(--acc)}
+.tgl{width:40px;height:21px;background:var(--s2);border:1px solid var(--b2);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tgl.on{background:var(--acc);border-color:var(--acc)}
+.tgl::after{content:'';position:absolute;width:15px;height:15px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .17s}
+.tgl.on::after{transform:translateX(19px)}
+.tgl-sm{width:34px;height:18px}.tgl-sm::after{width:12px;height:12px}.tgl-sm.on::after{transform:translateX(16px)}
+/* Forms */
+.form-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}
+.field input,.field select{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:9px;color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--acc)}.field input::placeholder{color:var(--muted)}.field select option{background:var(--s2)}
+.tgl-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--b);margin-top:7px}
+.tgl-lbl{font-size:13px}.tgl-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.svc-tags{display:flex;flex-wrap:wrap;gap:7px;min-height:28px}
+.stag{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);border:1px solid var(--b);border-radius:7px;font-size:12px}
+.stag .rm{color:var(--muted);cursor:pointer;font-size:15px;line-height:1}.stag .rm:hover{color:var(--danger)}
+.rename-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.rename-row input{flex:1;min-width:140px;padding:8px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}.rename-row input:focus{border-color:var(--acc)}
+.email-box{background:var(--s2);border:1px solid var(--b);border-radius:11px;padding:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.email-box input{flex:1;min-width:180px;padding:9px 12px;background:var(--s1);border:1px solid var(--b);border-radius:8px;color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}.email-box input:focus{border-color:var(--acc)}.email-box input::placeholder{color:var(--muted)}
+.ld{display:flex;align-items:center;justify-content:center;padding:38px;color:var(--muted);gap:7px}
+.sp{width:15px;height:15px;border:2px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--acc);color:#07080c;padding:10px 18px;border-radius:9px;font-weight:600;font-size:13px;opacity:0;transform:translateY(7px);transition:all .24s;z-index:999}
+.toast.show{opacity:1;transform:none}.toast.err{background:var(--danger);color:#fff}
+@media(max-width:768px){
+  .side{width:52px}.side-top .side-owner,.side-nav .snav-sec,.nl span,.side-bot span,.side-logo em{display:none}
+  .side-logo{font-size:11px}.nl{justify-content:center;padding:13px}
+  .content{margin-left:52px;padding:16px}.stats{grid-template-columns:1fr 1fr}.branch-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="lbox">
+    <div class="llogo">Green <em>Salon</em></div>
+    <div class="lsub">Owner Panel v9</div>
+    <label class="llbl">Password</label>
+    <input type="password" class="linput" id="lpw" placeholder="Enter owner password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Login to Dashboard</button>
+    <div class="lerr" id="lerr"></div>
+  </div>
+</div>
+
+<div id="app">
+<div class="layout">
+<div class="side">
+  <div class="side-top"><div class="side-logo">Green <em>Salon</em></div><div class="side-owner">Welcome, Harsha</div></div>
+  <div class="side-nav">
+    <div class="snav-sec">Overview</div>
+    <div class="nl on" id="nl-branches" onclick="nav('branches')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>All Branches</span></div>
+    <div class="snav-sec" id="b-sec" style="display:none">Branch</div>
+    <div class="nl" id="nl-today" style="display:none" onclick="nav('today')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Today</span></div>
+    <div class="nl" id="nl-entries" style="display:none" onclick="nav('entries')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg><span>Entries</span></div>
+    <div class="nl" id="nl-monthly" style="display:none" onclick="loadMonthly();nav('monthly')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Monthly</span></div>
+    <div class="nl" id="nl-staff" style="display:none" onclick="nav('staff')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Staff</span></div>
+    <div class="nl" id="nl-services" style="display:none" onclick="nav('services')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 12h6M9 16h4"/></svg><span>Services</span></div>
+    <div class="nl" id="nl-products" style="display:none" onclick="nav('products')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg><span>Products</span></div>
+    <div class="nl" id="nl-settings" style="display:none" onclick="nav('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></div>
+  </div>
+  <div class="side-bot"><div class="logout" onclick="logout()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Logout</span></div></div>
+</div>
+
+<div class="content">
+
+<!-- BRANCHES -->
+<div class="pg on" id="pg-branches">
+  <div class="ph">
+    <div><div class="ptitle">All Branches</div><div class="psub" id="b-sub">Your salon network</div></div>
+    <!-- ADD BRANCH — uncomment when client pays for more branches:
+    <button class="btn btn-acc" onclick="openAddModal()">+ Add Branch</button>
+    -->
+  </div>
+  <div class="branch-grid" id="branch-grid"><div class="ld"><div class="sp"></div> Loading...</div></div>
+  <div id="deleted-section" style="display:none;margin-top:24px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--muted);margin-bottom:12px">🗑 Deleted Branches — <span style="color:var(--txt);font-size:13px;font-weight:400">All data preserved. Click Recover to restore.</span></div>
+    <div class="branch-grid" id="deleted-grid"></div>
+  </div>
+</div>
+
+<!-- TODAY -->
+<div class="pg" id="pg-today">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc1"></span><span class="bc-sep">›</span><span>Today</span></div>
+  <div class="ph"><div><div class="ptitle" id="today-title">Today</div><div class="psub" id="today-sub"></div></div><button class="btn btn-ghost" onclick="loadToday()">↻ Refresh</button></div>
+  <div class="stats">
+    <div class="sc"><div class="sc-lbl">Services</div><div class="sc-val g" id="st-svc">₹—</div></div>
+    <div class="sc"><div class="sc-lbl">Products</div><div class="sc-val pr" id="st-prod">₹—</div></div>
+    <div class="sc"><div class="sc-lbl">Tips</div><div class="sc-val y" id="st-tip">₹—</div></div>
+    <div class="sc"><div class="sc-lbl">Expenses</div><div class="sc-val r" id="st-exp">₹—</div></div>
+    <div class="sc"><div class="sc-lbl">Count</div><div class="sc-val" id="st-cnt">—</div></div>
+    <div class="sc"><div class="sc-lbl">Active Staff</div><div class="sc-val p" id="st-stf">—</div></div>
+  </div>
+  <div class="card"><div class="card-head"><div class="card-title">Staff Performance</div></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Staff</th><th>Services</th><th>Revenue</th><th>Products</th><th>Tips</th><th>Total</th></tr></thead><tbody id="perf-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ENTRIES -->
+<div class="pg" id="pg-entries">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc2"></span><span class="bc-sep">›</span><span>Entries</span></div>
+  <div class="ph"><div><div class="ptitle">Today's Entries</div><div class="psub">Removed entries flagged in Sheet (data preserved)</div></div><button class="btn btn-ghost" onclick="loadToday()">↻ Refresh</button></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-head"><div class="card-title">Services</div></div><div style="overflow-x:auto"><table><thead><tr><th>Time</th><th>Staff</th><th>Service</th><th>Amt</th><th>Tip</th><th>Pay</th><th>Action</th></tr></thead><tbody id="ent-body"></tbody></table></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="card-head"><div class="card-title" style="color:var(--product)">Product Sales</div></div><div style="overflow-x:auto"><table><thead><tr><th>Time</th><th>Staff</th><th>Product</th><th>Amt</th><th>Pay</th><th>Action</th></tr></thead><tbody id="prod-body"></tbody></table></div></div>
+  <div class="card"><div class="card-head"><div class="card-title" style="color:var(--danger)">Expenses</div></div><div style="overflow-x:auto"><table><thead><tr><th>Time</th><th>Staff</th><th>Description</th><th>Amt</th><th>Pay</th><th>Action</th></tr></thead><tbody id="exp-body"></tbody></table></div></div>
+</div>
+
+<!-- MONTHLY -->
+<div class="pg" id="pg-monthly">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc3"></span><span class="bc-sep">›</span><span id="month-lbl">Monthly</span></div>
+  <div class="ph"><div><div class="ptitle" id="monthly-title">Monthly Summary</div><div class="psub">Per-staff daily totals — matches Google Sheet format</div></div><button class="btn btn-ghost" onclick="loadMonthly()">↻ Refresh</button></div>
+  <div class="card" style="overflow-x:auto"><table><thead><tr id="month-hdr"></tr></thead><tbody id="month-body"></tbody></table></div>
+</div>
+
+<!-- STAFF -->
+<div class="pg" id="pg-staff">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc4"></span><span class="bc-sep">›</span><span>Staff</span></div>
+  <div class="ph"><div><div class="ptitle">Manage Staff</div><div class="psub">Edit name · toggle commission · add · remove — all sync to tablet &amp; Sheet</div></div></div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-head"><div class="card-title">Add New Staff Member</div></div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Full Name</label><input type="text" id="ns-name" placeholder="e.g. Ali"></div>
+        <div class="field"><label>4-Digit PIN</label><input type="text" id="ns-pin" placeholder="1234" maxlength="4" inputmode="numeric"></div>
+        <div class="field"><label>Commission %</label><input type="number" id="ns-comm" placeholder="40" min="0" max="100" value="40"></div>
+      </div>
+      <div class="tgl-row">
+        <div><div class="tgl-lbl">Commission Enabled</div><div class="tgl-sub">Toggle off for fixed-salary staff</div></div>
+        <div class="tgl on" id="ns-tgl" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <button class="btn btn-acc" onclick="addStaff()" style="margin-top:12px">+ Add to Branch</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">Current Staff</div><span style="font-size:12px;color:var(--muted)">✏ Edit name · toggle commission · remove</span></div>
+    <div id="staff-list"><div class="ld"><div class="sp"></div></div></div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="pg" id="pg-services">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc5"></span><span class="bc-sep">›</span><span>Services</span></div>
+  <div class="ph"><div><div class="ptitle">Service Menu</div><div class="psub">Services shown on tablet for this branch</div></div></div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-head"><div class="card-title">Add Service</div></div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Service Name</label><input type="text" id="new-sv-n" placeholder="e.g. Hot Towel Shave"></div>
+        <div class="field"><label>Price (₹)</label><input type="number" id="new-sv-p" placeholder="250"></div>
+      </div>
+      <button class="btn btn-acc" onclick="addSvc()">Add Service</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><div class="card-title">Current Services</div><button class="btn btn-acc btn-sm" onclick="saveSvcs()">Save to Sheet</button></div><div class="card-body"><div class="svc-tags" id="svc-tags"></div></div></div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="pg" id="pg-products">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc6"></span><span class="bc-sep">›</span><span>Products</span></div>
+  <div class="ph"><div><div class="ptitle">Product Menu</div><div class="psub">Products staff can select when recording a sale</div></div></div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-head"><div class="card-title">Add Product</div></div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Product Name</label><input type="text" id="new-pd-n" placeholder="e.g. Argan Oil"></div>
+        <div class="field"><label>Price (₹)</label><input type="number" id="new-pd-p" placeholder="250"></div>
+      </div>
+      <button class="btn btn-acc" onclick="addProd()">Add Product</button>
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><div class="card-title">Current Products</div><button class="btn btn-acc btn-sm" onclick="saveProds()">Save to Sheet</button></div><div class="card-body"><div class="svc-tags" id="prod-tags"></div></div></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="pg" id="pg-settings">
+  <div class="bc-nav"><span class="bc-link" onclick="nav('branches')">All Branches</span><span class="bc-sep">›</span><span id="bc7"></span><span class="bc-sep">›</span><span>Settings</span></div>
+  <div class="ph"><div><div class="ptitle">Branch Settings</div><div class="psub">Rename · email recipients · manual reports</div></div></div>
+
+  <!-- Rename branch -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-head"><div class="card-title">Rename Branch</div></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Updates the dashboard name and Google Sheet monthly tab header.</p>
+      <div class="rename-row"><input type="text" id="rename-input" placeholder="New branch name..."><button class="btn btn-acc" onclick="doRename()">Rename</button></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:6px" id="rename-status"></p>
+    </div>
+  </div>
+
+  <!-- 3 Email recipients -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-head"><div class="card-title">📧 Report Email Recipients</div></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Daily report sent at <strong style="color:var(--txt)">11:59 PM IST</strong> with CSV attachments (Entries, Products, Expenses).<br>
+        Monthly report sent on the <strong style="color:var(--txt)">last day of each month</strong>.<br>
+        All 3 recipients receive every report. Leave blank to disable that slot.
+      </p>
+      <div class="field" style="margin-bottom:11px">
+        <label>Recipient 1 (Primary)</label>
+        <input type="email" id="email-1" placeholder="owner@gmail.com">
+      </div>
+      <div class="field" style="margin-bottom:11px">
+        <label>Recipient 2</label>
+        <input type="email" id="email-2" placeholder="manager@gmail.com (optional)">
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <label>Recipient 3</label>
+        <input type="email" id="email-3" placeholder="accountant@gmail.com (optional)">
+      </div>
+      <button class="btn btn-acc" onclick="saveEmails()" style="margin-right:9px">Save Recipients</button>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px" id="email-status"></p>
+    </div>
+  </div>
+
+  <!-- Manual report send -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📤 Send Report Now</div></div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Manually send a report to all saved recipients right now. Useful for testing or on-demand reports.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-acc" onclick="sendReport('daily')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Send Daily Report (CSV)
+        </button>
+        <button class="btn btn-ghost" onclick="sendReport('monthly')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Send Monthly Report (CSV)
+        </button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px" id="report-status"></p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- ADD BRANCH MODAL — uncomment both this and the button above when client pays for more branches
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:200;padding:20px" id="add-modal" onclick="if(this===event.target)closeAddModal()">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-radius:18px;padding:30px;width:100%;max-width:500px">
+    <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:5px">Add New Branch</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6">Create a new Google Sheet first. Paste its Sheet ID (between /d/ and /edit in URL).</div>
+    <div class="field" style="margin-bottom:11px"><label>Branch Name</label><input type="text" id="m-name" placeholder="e.g. Whitefield Green Salon"></div>
+    <div class="field" style="margin-bottom:11px"><label>Location</label><input type="text" id="m-loc" placeholder="e.g. Whitefield, Bangalore"></div>
+    <div class="field" style="margin-bottom:5px"><label>Google Sheet ID</label><input type="text" id="m-sheet" placeholder="Paste Sheet ID here"></div>
+    <div style="display:flex;gap:9px;margin-top:18px">
+      <button class="btn btn-acc" onclick="doAddBranch()">Create Branch</button>
+      <button class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
+    </div>
+    <div style="color:var(--danger);font-size:12px;margin-top:8px" id="modal-err"></div>
+  </div>
+</div>
+-->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── PASTE YOUR REAL APPS SCRIPT URL HERE ─────────────────────
+const API_URL = "https://script.google.com/macros/s/AKfycbwz9mJfKcw_vtdy0LEyT-f_1HBbzHAlfjl4Tl9yTkRBgQNh_-A-OzIZgtcXJSi70pT1gw/exec";
+
+let ST = { branches:[], deleted:[], cur:null, staff:[], services:[], products:[] };
+
+async function GET(a, b='') {
+  const r = await fetch(`${API_URL}?action=${a}&branchId=${b}`);
+  const ct = r.headers.get('content-type')||'';
+  if (!ct.includes('json')&&!ct.includes('plain')) throw new Error('API returned HTML — check: Execute as Me, Anyone access');
+  return r.json();
+}
+async function POST(b) {
+  const r = await fetch(API_URL, {method:'POST', body:JSON.stringify(b)});
+  const ct = r.headers.get('content-type')||'';
+  if (!ct.includes('json')&&!ct.includes('plain')) throw new Error('API returned HTML — check: Execute as Me, Anyone access');
+  return r.json();
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+async function doLogin() {
+  const pw = document.getElementById('lpw').value;
+  document.getElementById('lerr').textContent = '';
+  try {
+    const d = await POST({action:'ownerLogin', password:pw});
+    if (d.success) {
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='block';
+      document.getElementById('today-sub').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      await loadBranches();
+    } else {
+      document.getElementById('lerr').textContent = 'Wrong password.';
+    }
+  } catch(ex) {
+    document.getElementById('lerr').textContent = 'Connection error: '+ex.message+'. Fix: open owner-panel HTML → find API_URL → paste your real /exec URL → re-upload to GitHub.';
+  }
+}
+
+function logout() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='flex';
+  document.getElementById('lpw').value=''; ST.cur=null; hideBNav();
+}
+
+// ── BRANCHES ─────────────────────────────────────────────────
+async function loadBranches() {
+  try {
+    const d = await POST({action:'getBranches'});
+    if (d.success) { ST.branches=d.branches||[]; ST.deleted=d.deleted||[]; renderBranches(); }
+  } catch(ex) {
+    document.getElementById('branch-grid').innerHTML='<div style="padding:40px;color:var(--danger)">Error: '+ex.message+'</div>';
+  }
+}
+
+function renderBranches() {
+  const n = ST.branches.length;
+  document.getElementById('b-sub').textContent = n+' branch'+(n!==1?'es':'')+' active';
+  const g = document.getElementById('branch-grid');
+  g.innerHTML = n ? ST.branches.map(b=>`
+    <div class="bcard bcard-click" onclick="drillIn('${b.id}','${b.name}','${b.location||''}')">
+      <div class="bcard-name">${b.name}</div>
+      <div class="bcard-loc">📍 ${b.location||'No location'}</div>
+      <div class="bcard-stats">
+        <div class="bcs"><div class="bcs-lbl">Today Revenue</div><div class="bcs-val" id="brev-${b.id}">₹—</div></div>
+        <div class="bcs"><div class="bcs-lbl">Status</div><div class="bcs-val" style="font-size:12px;color:var(--acc)">Active</div></div>
+      </div>
+      <div class="bcard-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-warn btn-sm" onclick="askRename('${b.id}','${b.name}')">✏ Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('${b.id}','${b.name}')">🗑 Delete</button>
+      </div>
+      <div class="bcard-foot"><span>ID: ${b.id}</span><span class="copy-id" onclick="event.stopPropagation();copyId('${b.id}')">Copy ID</span></div>
+    </div>`).join('')
+  : '<div style="padding:40px;text-align:center;color:var(--muted)">No active branches.</div>';
+  ST.branches.forEach(b => loadRevCard(b.id));
+
+  const delSec = document.getElementById('deleted-section');
+  if (ST.deleted.length) {
+    delSec.style.display='block';
+    document.getElementById('deleted-grid').innerHTML = ST.deleted.map(b=>`
+      <div class="bcard bcard-deleted">
+        <div class="deleted-tag">🗑 Deleted</div>
+        <div class="bcard-name">${b.name}</div>
+        <div class="bcard-loc">📍 ${b.location||'No location'}</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">All data is preserved. Click Recover to restore.</p>
+        <div class="bcard-actions"><button class="btn btn-recover btn-sm" onclick="recoverBranch('${b.id}','${b.name}')">↩ Recover</button></div>
+        <div class="bcard-foot"><span>Deleted: ${b.deletedAt||'—'}</span></div>
+      </div>`).join('');
+  } else { delSec.style.display='none'; }
+}
+
+async function loadRevCard(bid) {
+  try {
+    const d = await POST({action:'getTodayAll', branchId:bid});
+    if (d.success) { const t=(d.staffTotals||[]).reduce((s,x)=>s+x.totalAmount+x.totalTip,0); const el=document.getElementById('brev-'+bid); if(el)el.textContent='₹'+t; }
+  } catch(ex) {}
+}
+
+function askRename(id,name){const n=prompt(`Rename "${name}" to:`);if(!n||!n.trim()||n.trim()===name)return;doRenameById(id,n.trim());}
+async function doRenameById(id,newName){
+  try{const d=await POST({action:'renameBranch',branchId:id,newName});if(d.success){toast('Branch renamed ✓');await loadBranches();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+function askDelete(id,name){if(!confirm(`Delete "${name}"?\n\nAll Google Sheet data is preserved.\nYou can recover this branch anytime.`))return;doDeleteBranch(id,name);}
+async function doDeleteBranch(id,name){
+  try{const d=await POST({action:'removeBranch',branchId:id});if(d.success){toast(`"${name}" deleted. Recover anytime.`);await loadBranches();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+async function recoverBranch(id,name){
+  if(!confirm(`Recover "${name}"?`))return;
+  try{const d=await POST({action:'recoverBranch',branchId:id});if(d.success){toast(`"${name}" recovered ✓`);await loadBranches();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+
+// Add Branch functions — COMMENTED OUT (enable when client pays for more branches)
+/*
+function openAddModal(){document.getElementById('add-modal').style.display='flex';}
+function closeAddModal(){document.getElementById('add-modal').style.display='none';document.getElementById('modal-err').textContent='';}
+async function doAddBranch(){
+  const name=document.getElementById('m-name').value.trim(),loc=document.getElementById('m-loc').value.trim(),sid=document.getElementById('m-sheet').value.trim(),err=document.getElementById('modal-err');
+  if(!name||!sid){err.textContent='Branch name and Sheet ID required';return;}err.textContent='Creating...';
+  try{const d=await POST({action:'addBranch',name,location:loc,sheetId:sid});if(d.success){toast(name+' added!');closeAddModal();['m-name','m-loc','m-sheet'].forEach(id=>document.getElementById(id).value='');await loadBranches();}else err.textContent=d.error||'Failed';}
+  catch(ex){err.textContent='Error: '+ex.message;}
+}
+*/
+
+async function drillIn(id,name,loc) {
+  ST.cur={id,name,location:loc};
+  ['bc1','bc2','bc3','bc4','bc5','bc6','bc7'].forEach(x=>{const e=document.getElementById(x);if(e)e.textContent=name;});
+  document.getElementById('today-title').textContent=name;
+  document.getElementById('monthly-title').textContent='Monthly — '+name;
+  showBNav();
+  await Promise.all([loadToday(), loadStaff(), loadSvcs(), loadProds()]);
+  nav('today');
+}
+
+function showBNav(){document.getElementById('b-sec').style.display='block';['nl-today','nl-entries','nl-monthly','nl-staff','nl-services','nl-products','nl-settings'].forEach(id=>document.getElementById(id).style.display='flex');}
+function hideBNav(){document.getElementById('b-sec').style.display='none';['nl-today','nl-entries','nl-monthly','nl-staff','nl-services','nl-products','nl-settings'].forEach(id=>document.getElementById(id).style.display='none');}
+function copyId(id){navigator.clipboard.writeText(id).then(()=>toast('Branch ID copied!')).catch(()=>{});}
+
+// ── NAV ───────────────────────────────────────────────────────
+function nav(pg) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nl').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  const nl=document.getElementById('nl-'+pg);
+  if(nl)nl.classList.add('on'); else document.getElementById('nl-branches').classList.add('on');
+  if(pg==='settings'&&ST.cur){loadEmail();document.getElementById('rename-input').value=ST.cur.name||'';}
+  if(pg==='entries'&&ST.cur) loadToday();
+}
+
+// ── TODAY — loads all 3 entry types and updates all tables ────
+async function loadToday() {
+  if (!ST.cur) return;
+  ['ent-body','prod-body','exp-body','perf-body'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr>';});
+  try {
+    const d = await POST({action:'getTodayAll', branchId:ST.cur.id});
+    if (!d.success) { toast('Error: '+d.error, true); return; }
+
+    const tots=d.staffTotals||[], ents=d.entries||[], prds=d.productSales||[], exps=d.expenses||[];
+    document.getElementById('st-svc').textContent  = '₹'+tots.reduce((s,t)=>s+t.totalAmount,0);
+    document.getElementById('st-prod').textContent = '₹'+tots.reduce((s,t)=>s+(t.products||0),0);
+    document.getElementById('st-tip').textContent  = '₹'+tots.reduce((s,t)=>s+t.totalTip,0);
+    document.getElementById('st-exp').textContent  = '₹'+(d.totalExp||0);
+    document.getElementById('st-cnt').textContent  = tots.reduce((s,t)=>s+(t.entries||0),0);
+    document.getElementById('st-stf').textContent  = tots.length;
+
+    document.getElementById('perf-body').innerHTML = tots.length
+      ? tots.map(t=>`<tr><td><strong>${t.name}</strong></td><td>${t.entries}</td><td style="color:var(--acc)">₹${t.totalAmount}</td><td style="color:var(--product)">₹${t.products||0}</td><td style="color:var(--warn)">₹${t.totalTip}</td><td style="color:var(--acc);font-weight:700">₹${t.totalAmount+t.totalTip+(t.products||0)}</td></tr>`).join('')
+      : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">No entries today yet</td></tr>';
+
+    document.getElementById('ent-body').innerHTML = ents.length
+      ? ents.map(e=>{const pc=e.paymentMethod==='Cash'?'bc':e.paymentMethod==='Online'?'bo':'bu';const t=(e.timestamp||'').split(' ')[1]||'';
+          return `<tr class="${e.flagged?'flagged':''}"><td>${t}</td><td>${e.staffName}</td><td>${e.service}</td><td style="color:var(--acc)">₹${e.amount}</td><td style="color:var(--warn)">${Number(e.tip)>0?'₹'+e.tip:'—'}</td><td><span class="badge ${pc}">${e.paymentMethod}</span></td><td>${e.flagged?'<span style="color:var(--muted);font-size:11px">Removed</span>':`<button class="btn btn-danger btn-sm" onclick="rmEntry('${e.rowId}','service')">Remove</button>`}</td></tr>`;})
+        .join('')
+      : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:22px">No service entries today</td></tr>';
+
+    document.getElementById('prod-body').innerHTML = prds.length
+      ? prds.map(p=>{const pc=p.paymentMethod==='Cash'?'bc':p.paymentMethod==='Online'?'bo':'bu';const t=(p.timestamp||'').split(' ')[1]||'';
+          return `<tr class="${p.flagged?'flagged':''}"><td>${t}</td><td>${p.staffName}</td><td>${p.product}</td><td style="color:var(--product)">₹${p.amount}</td><td><span class="badge ${pc}">${p.paymentMethod}</span></td><td>${p.flagged?'<span style="color:var(--muted);font-size:11px">Removed</span>':`<button class="btn btn-danger btn-sm" onclick="rmEntry('${p.rowId}','product')">Remove</button>`}</td></tr>`;})
+        .join('')
+      : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">No product sales today</td></tr>';
+
+    document.getElementById('exp-body').innerHTML = exps.length
+      ? exps.map(x=>{const pc=x.paymentMethod==='Cash'?'bc':x.paymentMethod==='Online'?'bo':'bu';const t=(x.timestamp||'').split(' ')[1]||'';
+          return `<tr class="${x.flagged?'flagged':''}"><td>${t}</td><td>${x.staffName}</td><td>${x.description}</td><td style="color:var(--danger)">₹${x.amount}</td><td><span class="badge ${pc}">${x.paymentMethod}</span></td><td>${x.flagged?'<span style="color:var(--muted);font-size:11px">Removed</span>':`<button class="btn btn-danger btn-sm" onclick="rmEntry('${x.rowId}','expense')">Remove</button>`}</td></tr>`;})
+        .join('')
+      : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">No expenses today</td></tr>';
+
+  } catch(ex) { toast('Error loading today: '+ex.message, true); }
+}
+
+async function rmEntry(rowId,type) {
+  if(!confirm('Remove this entry?\n\nData is preserved in Google Sheet (flagged), just not counted in totals.'))return;
+  const m={service:'deleteEntry',product:'deleteProduct',expense:'deleteExpense'};
+  try{const d=await POST({action:m[type],branchId:ST.cur.id,rowId});if(d.success){toast('Removed — flagged in Sheet ✓');loadToday();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+
+// ── MONTHLY ──────────────────────────────────────────────────
+async function loadMonthly() {
+  if (!ST.cur) return;
+  document.getElementById('month-body').innerHTML='<tr><td colspan="14"><div class="ld"><div class="sp"></div></div></td></tr>';
+  try {
+    const d = await POST({action:'getMonthSummary', branchId:ST.cur.id});
+    document.getElementById('month-lbl').textContent=d.month||'Monthly';
+    if (!d.summary||!d.summary.length) {
+      document.getElementById('month-hdr').innerHTML='';
+      document.getElementById('month-body').innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:30px">No data this month yet. Entries submitted from tablets will appear here automatically.</td></tr>';
+      return;
+    }
+    const keys=Object.keys(d.summary[0]);
+    document.getElementById('month-hdr').innerHTML=keys.map(k=>`<th>${k}</th>`).join('');
+    document.getElementById('month-body').innerHTML=d.summary.map(r=>`<tr>${keys.map(k=>{
+      const v=r[k];
+      if(k==='Date')     return `<td><strong>${v}</strong></td>`;
+      if(k==='TOTAL')    return `<td style="font-weight:700">${v}</td>`;
+      if(k==='Total')    return `<td style="color:var(--acc);font-weight:700">₹${v||0}</td>`;
+      if(k==='Expenses') return `<td style="color:var(--danger)">₹${v||0}</td>`;
+      if(k==='Commission')return `<td style="color:var(--warn)">₹${v||0}</td>`;
+      return `<td>${typeof v==='number'?'₹'+v:v||'—'}</td>`;
+    }).join('')}</tr>`).join('');
+  } catch(ex) { toast('Error loading monthly: '+ex.message, true); }
+}
+
+// ── STAFF — edit name inline, commission toggle ───────────────
+async function loadStaff() {
+  if (!ST.cur) return;
+  try{const d=await POST({action:'getStaffAdmin',branchId:ST.cur.id});if(d.success){ST.staff=d.staff||[];renderStaff();}}catch(ex){}
+}
+
+function renderStaff() {
+  const el=document.getElementById('staff-list');
+  if(!ST.staff.length){el.innerHTML='<div style="padding:36px;text-align:center;color:var(--muted)">No staff added yet</div>';return;}
+  el.innerHTML=ST.staff.map(s=>`
+    <div class="staff-row" id="srow-${s.id}">
+      <div class="sav">${s.name[0].toUpperCase()}</div>
+      <div class="sinfo">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="sname" id="sname-${s.id}">${s.name}</div>
+          <div class="sname-edit" id="sedit-${s.id}">
+            <input class="sname-input" id="sinput-${s.id}" value="${s.name}" onkeydown="if(event.key==='Enter')saveRename('${s.id}');if(event.key==='Escape')cancelRename('${s.id}')">
+          </div>
+        </div>
+        <div class="smeta">${s.hasCommission?'Commission: '+s.commissionPct+'%':'No commission — fixed salary'}</div>
+      </div>
+      <div class="sactions">
+        <button class="btn btn-warn btn-sm" id="ebtn-${s.id}" onclick="startRename('${s.id}')">✏ Edit</button>
+        <button class="btn btn-acc btn-sm" id="sbtn-${s.id}" style="display:none" onclick="saveRename('${s.id}')">Save</button>
+        <div class="comm-tgl">
+          <span>Comm</span>
+          <div class="tgl tgl-sm ${s.hasCommission?'on':''}" id="ctgl-${s.id}" onclick="toggleComm('${s.id}',this)"></div>
+        </div>
+        <input class="comm-input" id="cpct-${s.id}" type="number" min="0" max="100" value="${s.commissionPct||40}" style="display:${s.hasCommission?'block':'none'}" onchange="saveComm('${s.id}',this.value)" title="Commission %">
+        <button class="btn btn-danger btn-sm" onclick="rmStaff('${s.id}','${s.name}')">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function startRename(staffId) {
+  document.getElementById('sname-'+staffId).style.display='none';
+  document.getElementById('sedit-'+staffId).style.display='block';
+  document.getElementById('ebtn-'+staffId).style.display='none';
+  document.getElementById('sbtn-'+staffId).style.display='inline-flex';
+  document.getElementById('sinput-'+staffId).focus();
+}
+function cancelRename(staffId) {
+  document.getElementById('sname-'+staffId).style.display='block';
+  document.getElementById('sedit-'+staffId).style.display='none';
+  document.getElementById('ebtn-'+staffId).style.display='inline-flex';
+  document.getElementById('sbtn-'+staffId).style.display='none';
+}
+async function saveRename(staffId) {
+  const newName=document.getElementById('sinput-'+staffId).value.trim();
+  if(!newName){toast('Name cannot be empty',true);return;}
+  try{
+    const d=await POST({action:'renameStaff',branchId:ST.cur.id,staffId,newName});
+    if(d.success){toast(d.oldName+' renamed to '+newName+' ✓ (staff app updates on next load)');await loadStaff();}
+    else toast('Error: '+d.error,true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+}
+
+function toggleComm(staffId,tglEl) {
+  tglEl.classList.toggle('on');
+  const isOn=tglEl.classList.contains('on');
+  const pctEl=document.getElementById('cpct-'+staffId);
+  if(pctEl)pctEl.style.display=isOn?'block':'none';
+  saveCommDirect(staffId,Number(pctEl?pctEl.value:40)||40,isOn);
+}
+function saveComm(staffId,pct){const tgl=document.getElementById('ctgl-'+staffId);saveCommDirect(staffId,Number(pct)||40,tgl?tgl.classList.contains('on'):true);}
+async function saveCommDirect(staffId,commPct,hasComm){
+  try{const d=await POST({action:'updateStaffComm',branchId:ST.cur.id,staffId,commissionPct:commPct,hasCommission:hasComm});if(d.success)toast('Commission updated in Sheet ✓');else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+
+async function addStaff(){
+  const name=document.getElementById('ns-name').value.trim();
+  const pin=document.getElementById('ns-pin').value.trim();
+  const comm=Number(document.getElementById('ns-comm').value)||40;
+  const hasc=document.getElementById('ns-tgl').classList.contains('on');
+  if(!name||pin.length!==4){toast('Enter name and 4-digit PIN',true);return;}
+  try{
+    const d=await POST({action:'addStaff',branchId:ST.cur.id,name,pin,commissionPct:comm,hasCommission:hasc});
+    if(d.success){toast(name+' added — appears in tablet &amp; Sheet ✓');['ns-name','ns-pin','ns-comm'].forEach(id=>document.getElementById(id).value='');await loadStaff();}
+    else toast('Error: '+d.error,true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+}
+
+async function rmStaff(id,name){
+  if(!confirm('Remove '+name+' from this branch?\nThey will no longer appear in the tablet app.'))return;
+  try{const d=await POST({action:'removeStaff',branchId:ST.cur.id,staffId:id});if(d.success){toast(name+' removed ✓');await loadStaff();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+
+// ── SERVICES ─────────────────────────────────────────────────
+async function loadSvcs(){if(!ST.cur)return;try{const d=await GET('getServices',ST.cur.id);if(d.success){ST.services=d.services||[];renderSvcs();}}catch(ex){}}
+function renderSvcs(){const el=document.getElementById('svc-tags');el.innerHTML=ST.services.length?ST.services.map((s,i)=>`<div class="stag">${s.name} <span style="color:var(--muted)">₹${s.price}</span><span class="rm" onclick="rmSvc(${i})">×</span></div>`).join(''):'<div style="color:var(--muted)">No services yet</div>';}
+function addSvc(){const n=document.getElementById('new-sv-n').value.trim(),p=document.getElementById('new-sv-p').value;if(!n||!p){toast('Enter name and price',true);return;}ST.services.push({name:n,price:Number(p)});renderSvcs();document.getElementById('new-sv-n').value='';document.getElementById('new-sv-p').value='';toast(n+' added — click Save to Sheet');}
+function rmSvc(i){ST.services.splice(i,1);renderSvcs();}
+async function saveSvcs(){try{const d=await POST({action:'updateServices',branchId:ST.cur.id,services:ST.services});if(d.success)toast('Services saved to Sheet ✓');else toast('Error: '+d.error,true);}catch(ex){toast('Error: '+ex.message,true);}}
+
+// ── PRODUCTS ─────────────────────────────────────────────────
+async function loadProds(){if(!ST.cur)return;try{const d=await GET('getProducts',ST.cur.id);if(d.success){ST.products=d.products||[];renderProds();}}catch(ex){}}
+function renderProds(){const el=document.getElementById('prod-tags');el.innerHTML=ST.products.length?ST.products.map((p,i)=>`<div class="stag" style="border-color:rgba(167,139,250,.2)">🧴 ${p.name} <span style="color:var(--muted)">₹${p.price}</span><span class="rm" onclick="rmProd(${i})">×</span></div>`).join(''):'<div style="color:var(--muted)">No products yet</div>';}
+function addProd(){const n=document.getElementById('new-pd-n').value.trim(),p=document.getElementById('new-pd-p').value;if(!n||!p){toast('Enter name and price',true);return;}ST.products.push({name:n,price:Number(p)});renderProds();document.getElementById('new-pd-n').value='';document.getElementById('new-pd-p').value='';toast(n+' added — click Save to Sheet');}
+function rmProd(i){ST.products.splice(i,1);renderProds();}
+async function saveProds(){try{const d=await POST({action:'updateProducts',branchId:ST.cur.id,products:ST.products});if(d.success)toast('Products saved to Sheet ✓');else toast('Error: '+d.error,true);}catch(ex){toast('Error: '+ex.message,true);}}
+
+// ── SETTINGS — 3 EMAIL RECIPIENTS + MANUAL SEND ──────────────
+async function loadEmail(){
+  if(!ST.cur)return;
+  try{
+    const d=await POST({action:'getReportEmails',branchId:ST.cur.id});
+    if(d.success){
+      const emails=d.emails||[];
+      document.getElementById('email-1').value=emails[0]||'';
+      document.getElementById('email-2').value=emails[1]||'';
+      document.getElementById('email-3').value=emails[2]||'';
+      const active=emails.filter(Boolean);
+      document.getElementById('email-status').textContent=active.length
+        ?'Sending to: '+active.join(', ')
+        :'No recipients set — reports disabled.';
+    }
+  }catch(ex){}
+}
+
+async function saveEmails(){
+  const emails=[
+    document.getElementById('email-1').value.trim(),
+    document.getElementById('email-2').value.trim(),
+    document.getElementById('email-3').value.trim(),
+  ].filter(Boolean);
+  try{
+    const d=await POST({action:'setReportEmails',branchId:ST.cur.id,emails});
+    if(d.success){
+      toast('Email recipients saved ✓');
+      document.getElementById('email-status').textContent=emails.length?'Sending to: '+emails.join(', '):'Reports disabled.';
+    }else toast('Error: '+d.error,true);
+  }catch(ex){toast('Error: '+ex.message,true);}
+}
+
+async function sendReport(type){
+  const btn=event.target;
+  const statusEl=document.getElementById('report-status');
+  statusEl.textContent='Sending...';
+  try{
+    const d=await POST({action:'sendManualReport',branchId:ST.cur.id,type});
+    if(d.success){
+      toast(`${type==='monthly'?'Monthly':'Daily'} report sent to ${d.sent} recipient${d.sent!==1?'s':''} ✓`);
+      statusEl.textContent=`Last sent: ${new Date().toLocaleTimeString('en-IN')} → ${d.recipients.join(', ')}`;
+    }else{toast('Error: '+d.error,true);statusEl.textContent='Error: '+d.error;}
+  }catch(ex){toast('Error: '+ex.message,true);statusEl.textContent='Error: '+ex.message;}
+}
+async function doRename(){
+  const newName=document.getElementById('rename-input').value.trim();
+  if(!newName){toast('Enter a new name',true);return;}if(newName===ST.cur.name){toast('Name is the same');return;}
+  try{const d=await POST({action:'renameBranch',branchId:ST.cur.id,newName});if(d.success){const old=ST.cur.name;ST.cur.name=newName;['bc1','bc2','bc3','bc4','bc5','bc6','bc7'].forEach(x=>{const e=document.getElementById(x);if(e)e.textContent=newName;});document.getElementById('today-title').textContent=newName;document.getElementById('monthly-title').textContent='Monthly — '+newName;document.getElementById('rename-status').textContent=`Renamed from "${old}" to "${newName}"`;toast('Branch renamed ✓');await loadBranches();}else toast('Error: '+d.error,true);}
+  catch(ex){toast('Error: '+ex.message,true);}
+}
+
+function toast(msg,isErr){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isErr?' err':'');setTimeout(()=>t.className='toast',2800);}
+</script>
+</body>
+</html>
